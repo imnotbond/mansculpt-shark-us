@@ -28,7 +28,7 @@
 !function (w, d, t) {
   w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
   ttq.load('D69I62BC77UA1UK9FD7G');
-  ttq.page();
+  // ttq.page() removido — page_init do bb-tracker dispara ViewContent server-side com event_id (evita 2x VC nos relatórios)
 }(window, document, 'ttq');
 </script>
 
@@ -36,15 +36,29 @@
 <script>
 (function(){
   try {
+    // self-heal: cookie gravado pela versao antiga (SEGUNDOS, 10 digitos) vive ate
+    // 90 dias - Meta exige MILISSEGUNDOS; em segundos le ~1970, descarta o clique
+    // e a conversao espalha por view-through. Reescreve em ms.
+    function heal(name){
+      var m = document.cookie.match(new RegExp('(?:^|; )'+name+'=([^;]*)'));
+      if (!m) return;
+      var p = decodeURIComponent(m[1]).split('.');
+      var hts = Number(p[2]);
+      if (p.length >= 4 && hts > 0 && hts < 1e12) {
+        p[2] = String(Math.round(hts * 1000));
+        document.cookie = name + '=' + p.join('.') + '; max-age=7776000; path=/; SameSite=Lax';
+      }
+    }
+    heal('_fbc'); heal('_fbp');
     var params = new URLSearchParams(window.location.search);
     var fbclid = params.get('fbclid');
     if (fbclid) {
-      var ts = Math.floor(Date.now() / 1000);
+      var ts = Date.now();
       document.cookie = '_fbc=fb.1.' + ts + '.' + fbclid + '; max-age=7776000; path=/; SameSite=Lax';
     }
     if (!/(?:^|; )_fbp=/.test(document.cookie)) {
       var rnd = Math.floor(Math.random() * 2147483647);
-      var t2 = Math.floor(Date.now() / 1000);
+      var t2 = Date.now();
       document.cookie = '_fbp=fb.1.' + t2 + '.' + rnd + '; max-age=7776000; path=/; SameSite=Lax';
     }
   } catch (e) {}
@@ -495,7 +509,7 @@ img { max-width: 100%; height: auto; display: block; }
         <li>Support for healthy erectile function — naturally</li>
         <li>Used by 150,000+ men, doctor-recommended</li>
       </ul>
-      <a class="cta-button" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus">👉 Check Availability</a>
+      <a class="cta-button" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus%E2%84%A2">👉 Check Availability</a>
     </div>
   </div>
 </section>
@@ -520,7 +534,7 @@ img { max-width: 100%; height: auto; display: block; }
         <li class="bonus">BONUS #1: Quick Start Guide (PDF)</li>
         <li class="bonus">BONUS #2: Bedroom Confidence Playbook (PDF)</li>
       </ul>
-      <a class="order-button" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus">👉 Check Availability</a>
+      <a class="order-button" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus%E2%84%A2">👉 Check Availability</a>
       <p class="payment-icons">💳 🔒 Secure Checkout · Discreet Billing</p>
     </div>
   </div>
@@ -557,7 +571,7 @@ img { max-width: 100%; height: auto; display: block; }
       <p>If at any point in the next year you don't see firmer erections, better stamina, and renewed confidence in the bedroom — or even if you just don't like the design of the device — send it back. Our US-based team will refund <strong>100% of your money</strong>. No hassle. No interrogation. No "are you sure?" calls.</p>
       <p>That's how confident we are. <strong>You either love it, or you don't pay for it.</strong></p>
     </div>
-    <a class="guarantee-cta" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus">👉 Check Availability</a>
+    <a class="guarantee-cta" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus%E2%84%A2">👉 Check Availability</a>
   </div>
 </section>
 
@@ -572,7 +586,7 @@ img { max-width: 100%; height: auto; display: block; }
       <p>With Mansculpt™, that ends. Fifteen quiet minutes a day. No prescription. No pharmacy run. No clinic appointment. Just consistent, reliable erections coming back — usually within 3 weeks — and the version of you who used to walk into the bedroom without thinking twice.</p>
       <p>A life with confidence in the bedroom is always better than a life without it. <strong>So claim your Mansculpt™ now — before the first 100 units at this price are gone.</strong></p>
     </div>
-    <a class="urgency-cta" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus">👉 Check Availability</a>
+    <a class="urgency-cta" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus%E2%84%A2">👉 Check Availability</a>
   </div>
 </section>
 
@@ -596,7 +610,7 @@ img { max-width: 100%; height: auto; display: block; }
         <li class="bonus">BONUS #1: Quick Start Guide (PDF)</li>
         <li class="bonus">BONUS #2: Bedroom Confidence Playbook (PDF)</li>
       </ul>
-      <a class="order-button" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus">👉 Check Availability</a>
+      <a class="order-button" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus%E2%84%A2">👉 Check Availability</a>
       <p class="payment-icons">💳 🔒 Secure Checkout · Discreet Billing</p>
     </div>
   </div>
@@ -680,7 +694,7 @@ img { max-width: 100%; height: auto; display: block; }
     </div>
   </div>
   <div class="faq-cta-wrap">
-    <a class="faq-cta" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus">👉 Check Availability</a>
+    <a class="faq-cta" data-bb-cta data-bb-pack="1" href="https://mansculptplus.com/products/mansculpt-wave-therapy-plus%E2%84%A2">👉 Check Availability</a>
   </div>
 </section>
 
